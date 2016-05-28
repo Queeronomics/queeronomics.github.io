@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<head>
+	<title>City Index</title>
+	<script type="text/javascript" src="node_modules/d3/d3.min.js"></script>
+	<script type="text/javascript" src="node_modules/topojson/build/topojson.min.js"></script>
+	<script type="text/javascript">
+		(function() {
+  d3.fisheye = {
+    scale: function(scaleType) {
+      return d3_fisheye_scale(scaleType(), 3, 0);
+    },
+    circular: function() {
+      var radius = 200,
+          distortion = 2,
+          k0,
+          k1,
+          focus = [0, 0];
+
+      function fisheye(d) {
+        var dx = d.x - focus[0],
+            dy = d.y - focus[1],
+            dd = Math.sqrt(dx * dx + dy * dy);
+        if (!dd || dd >= radius) return {x: d.x, y: d.y, z: 1};
+        var k = k0 * (1 - Math.exp(-dd * k1)) / dd * .75 + .25;
+        return {x: focus[0] + dx * k, y: focus[1] + dy * k, z: Math.min(k, 10)};
+      }
+
+      function rescale() {
+        k0 = Math.exp(distortion);
+        k0 = k0 / (k0 - 1) * radius;
+        k1 = distortion / radius;
+        return fisheye;
+      }
+
+      fisheye.radius = function(_) {
+        if (!arguments.length) return radius;
+        radius = +_;
+        return rescale();
+      };
+
+      fisheye.distortion = function(_) {
+        if (!arguments.length) return distortion;
+        distortion = +_;
+        return rescale();
+      };
+
+      fisheye.focus = function(_) {
+        if (!arguments.length) return focus;
+        focus = _;
+        return fisheye;
+      };
+
+      return rescale();
+    }
+  };
+
+  function d3_fisheye_scale(scale, d, a) {
+
+    function fisheye(_) {
+      var x = scale(_),
+          left = x < a,
+          v,
+          range = d3.extent(scale.range()),
+          min = range[0],
+          max = range[1],
+          m = left ? a - min : max - a;
+      if (m == 0) m = max - min;
+      return (left ? -1 : 1) * m * (d + 1) / (d + (m / Math.abs(x - a))) + a;
+    }
+
+    fisheye.distortion = function(_) {
+      if (!arguments.length) return d;
+      d = +_;
+      return fisheye;
+    };
+
+    fisheye.focus = function(_) {
+      if (!arguments.length) return a;
+      a = +_;
+      return fisheye;
+    };
+
+    fisheye.copy = function() {
+      return d3_fisheye_scale(scale.copy(), d, a);
+    };
+
+    fisheye.nice = scale.nice;
+    fisheye.ticks = scale.ticks;
+    fisheye.tickFormat = scale.tickFormat;
+    return d3.rebind(fisheye, scale, "domain", "range");
+  }
+})();
+
+	</script>
+	<script type="text/javascript">
+    Object.prototype.extend = function(obj) {
+       for (var i in obj) {
+          if (obj.hasOwnProperty(i)) {
+             this[i] = obj[i];
+          }
+       }
+    };
+
+var CityIndex = {
+ "臺北": {
+   "sum(Weight)":33.40988983,
+   "sum(Push)":1615,
+   "sum(Std_Push)":9.44444453,
+   "count(*)":53,
+   "AvgPush":30.47169811,
+   "AvgStdPush":0.178197067,
+   "RawStdKeyIndex":5.953544363,
+   "StdKeyIndex":100
+ },
+ "新竹": {
+   "sum(Weight)":9.228557273,
+   "sum(Push)":476,
+   "sum(Std_Push)":2.783625744,
+   "count(*)":14,
+   "AvgPush":34,
+   "AvgStdPush":0.19883041,
+   "RawStdKeyIndex":1.834917829,
+   "StdKeyIndex":29.79
+ },
+ "新北": {
+   "sum(Weight)":7.467318888,
+   "sum(Push)":284,
+   "sum(Std_Push)":1.660818733,
+   "count(*)":10,
+   "AvgPush":28.4,
+   "AvgStdPush":0.166081873,
+   "RawStdKeyIndex":1.24018631,
+   "StdKeyIndex":19.65
+ },
+ "高雄": {
+   "sum(Weight)":8.487367157,
+   "sum(Push)":308,
+   "sum(Std_Push)":1.801169597,
+   "count(*)":15,
+   "AvgPush":20.53333333,
+   "AvgStdPush":0.120077973,
+   "RawStdKeyIndex":1.019145845,
+   "StdKeyIndex":15.88
+ },
+ "臺南": {
+   "sum(Weight)":5.366981392,
+   "sum(Push)":225,
+   "sum(Std_Push)":1.315789469,
+   "count(*)":9,
+   "AvgPush":25,
+   "AvgStdPush":0.14619883,
+   "RawStdKeyIndex":0.784646399,
+   "StdKeyIndex":11.89
+ },
+ "彰化": {
+   "sum(Weight)":1.254889798,
+   "sum(Push)":69,
+   "sum(Std_Push)":0.403508775,
+   "count(*)":2,
+   "AvgPush":34.5,
+   "AvgStdPush":0.201754387,
+   "RawStdKeyIndex":0.253179523,
+   "StdKeyIndex":2.83
+ },
+ "臺中": {
+   "sum(Weight)":0.533498442,
+   "sum(Push)":28,
+   "sum(Std_Push)":0.163742691,
+   "count(*)":1,
+   "AvgPush":28,
+   "AvgStdPush":0.163742691,
+   "RawStdKeyIndex":0.087356471,
+   "StdKeyIndex":0
+ },
+  "others": {
+   "sum(Weight)":0,
+   "sum(Push)":0,
+   "sum(Std_Push)":0,
+   "count(*)":0,
+   "AvgPush":0,
+   "AvgStdPush":0,
+   "StdKeyIndex":0
+ }
+};
+
+	d3.json("county.json", function(topodata) {
+		var features = topojson.feature(topodata, topodata.objects["County_MOI_1041215"]).features;
+		// 這裡要注意的是 topodata.objects["county"] 中的 "county" 為原本 shp 的檔名
+		var fisheye = d3.fisheye.circular().radius(100).distortion(2);
+	    var prj = function(v) {
+	      var ret = d3.geo.mercator().center([122,23.25]).scale(6000)(v);
+	      var ret = fisheye({x:ret[0],y:ret[1]});
+	      return [ret.x, ret.y];
+	    };
+		var path = d3.geo.path().projection(prj);
+
+		d3.select("svg").selectAll("path").data(features).enter().append("path");
+
+		for(i = features.length - 1; i >= 0; i --){
+			abbr = features[i].properties.C_Name.substring(0, 2);
+			
+			if(abbr in CityIndex){
+				features[i].properties.extend(CityIndex[abbr]);
+			}else{
+				features[i].properties.extend(CityIndex['others']);
+			}
+
+			//console.log(features[i].properties);
+			
+		}
+
+		var color = d3.scale.linear().domain([0,50]).range(["#090","#ff0"]);
+
+	    function update() {
+	      d3.select("svg").selectAll("path").attr({
+	        "d": path,
+	        "fill": function (d) { return color(d.properties.StdKeyIndex); }
+	      }).on("mouseover", function(d) {
+	      	document.getElementById('City').textContent = d.properties.C_Name.substring(0, 2);
+	      	document.getElementById('Pushes').textContent = d.properties['sum(Push)']+' 則推文';
+	      	document.getElementById('Posts').textContent = d.properties['count(*)']+' 篇自介';
+	      	document.getElementById('CityIndex').textContent = '城市甲甲指數： '+d.properties.StdKeyIndex;
+	        //$("#City").text(d.properties.C_Name);
+	        //$("#Pushes").text(d.properties.Pushes);
+
+	      });
+	    }
+	    d3.select("svg").on("mousemove", function() {
+	      fisheye.focus(d3.mouse(this));
+	      update();
+	    });
+	    update();
+
+
+	});
+
+    
+
+	</script>
+</head>
+<body>
+<svg width="800px" height="500px" viewBox="0 0 800 600"></svg>
+<div>
+	<center>
+	<h2 id="City"></h2>
+	<h3 id="Pushes"></h3>
+	<h3 id="Posts"></h3>
+	<h4 id="CityIndex"></h4>
+	</center>
+</div>
+</body>
+</html>
