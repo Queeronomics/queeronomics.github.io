@@ -3,8 +3,9 @@
 <meta charset="UTF-8">
 <head>
 	<title>City Index</title>
-	<script type="text/javascript" src="node_modules/d3/d3.js"></script>
-	<script type="text/javascript" src="node_modules/topojson/build/topojson.js"></script>
+	<script type="text/javascript" src="node_modules/d3/d3.min.js"></script>
+	<script type="text/javascript" src="node_modules/topojson/build/topojson.min.js"></script>
+  <!--script type="text/javascript" src="county.js"></script-->
 	<script type="text/javascript">
 		(function() {
   d3.fisheye = {
@@ -95,13 +96,6 @@
 
 	</script>
 	<script type="text/javascript">
-    Object.prototype.extend = function(obj) {
-       for (var i in obj) {
-          if (obj.hasOwnProperty(i)) {
-             this[i] = obj[i];
-          }
-       }
-    };
 
 var CityIndex = {
  "臺北": {
@@ -185,7 +179,17 @@ var CityIndex = {
  }
 };
 
+  function extend(self, obj){
+    for (var i in obj) {
+          if (obj.hasOwnProperty(i)) {
+             self[i] = obj[i];
+          }
+       }
+    return self;
+  }
+
 	d3.json("county.json", function(topodata) {
+//(function() {
 		var features = topojson.feature(topodata, topodata.objects["County_MOI_1041215"]).features;
 		// 這裡要注意的是 topodata.objects["county"] 中的 "county" 為原本 shp 的檔名
 		var fisheye = d3.fisheye.circular().radius(100).distortion(2);
@@ -202,9 +206,9 @@ var CityIndex = {
 			abbr = features[i].properties.C_Name.substring(0, 2);
 			
 			if(abbr in CityIndex){
-				features[i].properties.extend(CityIndex[abbr]);
+				features[i].properties = extend(features[i].properties, CityIndex[abbr]);
 			}else{
-				features[i].properties.extend(CityIndex['others']);
+				features[i].properties = extend(features[i].properties, CityIndex['others']);
 			}
 
 			//console.log(features[i].properties);
@@ -233,7 +237,7 @@ var CityIndex = {
 	    });
 	    update();
 
-
+//})();
 	});
 
     
